@@ -1,0 +1,33 @@
+{
+  "tag": {
+    "name": "test"
+  },
+  "agent": {
+    "interval": "10"
+  },
+  "inputs": [
+    {
+      "inputName": "fsNotify",
+      "params": {
+        "files": ["C:\\"],
+        "interval": "10"
+      },
+      "processors": [
+        {
+          "processorsName": "filter",
+          "params": {
+            "filterField": ["user"]
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "outputName": "file",
+      "params": {
+        "filePath": ""
+      }
+    }
+  ]
+}
