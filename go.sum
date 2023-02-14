@@ -1,0 +1,4 @@
+github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
+github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
+github.com/tovenja/cron/v3 v3.0.2 h1:yaO0K99CnERpXJHPuT5KwvnqVO3Sj2lV60tYk8CHrYI=
+github.com/tovenja/cron/v3 v3.0.2/go.mod h1:JAwtj0s1YprNovUWfeshFmmQ1VrWvKvYrzMekQq92Kk=

@@ -8,7 +8,12 @@ import (
 // main 主函数入口
 func main() {
 	// 初始化配置文件
-	config.LoadConfig()
-	//初始化agent
-	agent.InitAgent()
+	loadConfigRes := config.LoadConfig()
+
+	if loadConfigRes {
+		//初始化agent
+		agent.InitAgent()
+	}
+
+	select {}
 }

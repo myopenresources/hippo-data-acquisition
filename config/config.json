@@ -3,14 +3,14 @@
     "name": "test"
   },
   "agent": {
-    "interval": "10"
+    "spec": "*/10 * * * * *"
   },
   "inputs": [
     {
       "inputName": "fsNotify",
       "params": {
         "files": ["C:\\"],
-        "interval": "10"
+        "spec": "*/5 * * * * *"
       },
       "processors": [
         {

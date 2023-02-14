@@ -1,33 +1,33 @@
 package config
 
-type Tag struct {
+type TagConfig struct {
 	Name string `json:"name"`
 }
 
-type Agent struct {
-	Interval string `json:"interval"`
+type AgentConfig struct {
+	Spec string `json:"spec"`
 }
 
-type Processor struct {
+type ProcessorConfig struct {
 	ProcessorsName string                 `json:"processorsName"`
 	Params         map[string]interface{} `json:"params""`
 }
 
-type Input struct {
-	Tag        Tag                    `json:"tag""`
+type InputConfig struct {
+	Tag        TagConfig              `json:"tag""`
 	InputName  string                 `json:"inputName""`
 	Params     map[string]interface{} `json:"params""`
-	Processors []Processor            `json:"processors""`
+	Processors []ProcessorConfig      `json:"processors""`
 }
 
-type Output struct {
+type OutputConfig struct {
 	OutputName string                 `json:"outputName""`
 	Params     map[string]interface{} `json:"params""`
 }
 
-type Config struct {
-	Tag     Tag      `json:"tag""`
-	Agent   Agent    `json:"agent"`
-	Inputs  []Input  `json:"inputs"`
-	Outputs []Output `json:"outputs"`
+type DataAcquisitionConfig struct {
+	Tag     TagConfig      `json:"tag""`
+	Agent   AgentConfig    `json:"agent"`
+	Inputs  []InputConfig  `json:"inputs"`
+	Outputs []OutputConfig `json:"outputs"`
 }
