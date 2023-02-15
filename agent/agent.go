@@ -2,8 +2,10 @@ package agent
 
 import (
 	"fmt"
+	"hippo-data-acquisition/commons/logger"
+	"hippo-data-acquisition/commons/queue"
 	"hippo-data-acquisition/config"
-	"time"
+	"hippo-data-acquisition/plugins/inputs/fs_notify"
 )
 
 var (
@@ -17,7 +19,7 @@ func InitAgent() {
 
 func runInputs() {
 	for i := range config.DaqConfig.Inputs {
-		fmt.Println("正在启动input " + config.DaqConfig.Inputs[i].InputName + "！")
+		logger.LogInfo("agent", "正在启动input "+config.DaqConfig.Inputs[i].InputName+"！")
 		params := config.DaqConfig.Inputs[i].Params
 
 		specVal, ok := params["spec"]
@@ -28,13 +30,21 @@ func runInputs() {
 		cron := Cron{
 			spec: specVal.(string),
 		}
-		inputCron := cron.Start(func() {
-			fmt.Println(time.Now())
+
+		dataQueue := queue.NewDataQueue()
+		cronOk := cron.Start(func() {
 			// todo 反射获取input对象并且调用execute函数，将获取到的数据推送到处理器(私有处理，公共处理器)
+			fs := fs_notify.FsNotify{}
+			fs.ExeDataAcquisition(&dataQueue)
+
+			for i2 := range dataQueue.GetDataList() {
+				fmt.Println(dataQueue.GetDataList()[i2].Fields)
+			}
+			fmt.Println("================")
 		})
 
-		if inputCron == nil {
-			fmt.Println("启动input " + config.DaqConfig.Inputs[i].InputName + "成功！")
+		if cronOk == nil {
+			logger.LogInfo("agent", "启动input "+config.DaqConfig.Inputs[i].InputName+"成功！")
 		}
 
 		InputCronList = append(InputCronList, cron)

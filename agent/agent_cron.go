@@ -2,8 +2,8 @@ package agent
 
 import (
 	"context"
-	"fmt"
 	"github.com/tovenja/cron/v3"
+	"hippo-data-acquisition/commons/logger"
 )
 
 var (
@@ -20,7 +20,7 @@ func (c *Cron) Start(handle func()) error {
 	var err error = nil
 	entryID, err = agentCron.AddFunc(c.spec, handle)
 	if err != nil {
-		fmt.Println("启动定时器失败！")
+		logger.LogError("agent", "启动定时器失败！")
 		return err
 	}
 
