@@ -4,12 +4,12 @@ import "errors"
 
 type Queue interface {
 	PopData() (error, DataInfo)
-	PushData(fields map[string]interface{}, tags map[string]string)
+	PushData(dataBody map[string]interface{}, tag map[string]string)
 	GetDataList() []DataInfo
 }
 type DataInfo struct {
-	Fields map[string]interface{}
-	Tags   map[string]string
+	DataBody map[string]interface{}
+	Tag      map[string]string
 }
 
 type DataQueue struct {
@@ -23,10 +23,10 @@ func NewDataQueue() DataQueue {
 	return dataQueue
 }
 
-func (q *DataQueue) PushData(fields map[string]interface{}, tags map[string]string) {
+func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]string) {
 	q.dataList = append(q.dataList, DataInfo{
-		Fields: fields,
-		Tags:   tags,
+		DataBody: dataBody,
+		Tag:      tag,
 	})
 }
 

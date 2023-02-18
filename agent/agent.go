@@ -5,7 +5,8 @@ import (
 	"hippo-data-acquisition/commons/logger"
 	"hippo-data-acquisition/commons/queue"
 	"hippo-data-acquisition/config"
-	"hippo-data-acquisition/plugins/inputs/fs_notify"
+	"hippo-data-acquisition/inputs/input_collection"
+	"hippo-data-acquisition/inputs/plugins/fs_notify"
 )
 
 var (
@@ -37,8 +38,16 @@ func runInputs() {
 			fs := fs_notify.FsNotify{}
 			fs.ExeDataAcquisition(&dataQueue)
 
+			//all.GetInput()
+
+			inputs := input_collection.GetInputs()
+			plugin := inputs["fsNotify"]
+
+
+			fmt.Println(plugin)
+
 			for i2 := range dataQueue.GetDataList() {
-				fmt.Println(dataQueue.GetDataList()[i2].Fields)
+				fmt.Println(dataQueue.GetDataList()[i2].DataBody)
 			}
 			fmt.Println("================")
 		})
