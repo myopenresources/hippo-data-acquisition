@@ -6,11 +6,10 @@ import (
 	"hippo-data-acquisition/commons/queue"
 	"hippo-data-acquisition/config"
 	"hippo-data-acquisition/inputs/input_collection"
-	"hippo-data-acquisition/inputs/plugins/fs_notify"
 )
 
 var (
-	InputCronList []Cron = make([]Cron, 0)
+	InputCronList = make([]Cron, 0)
 )
 
 func InitAgent() {
@@ -28,28 +27,35 @@ func runInputs() {
 			specVal = config.DaqConfig.Agent.Spec
 		}
 
+		inputs := input_collection.GetInputs()
+		plugin := inputs[config.DaqConfig.Inputs[i].InputName]
+
+		// input插件不存在时
+		if plugin == nil {
+			logger.LogInfo("agent", "找不到input "+config.DaqConfig.Inputs[i].InputName+"！")
+			continue
+		}
+
 		cron := Cron{
 			spec: specVal.(string),
 		}
 
 		dataQueue := queue.NewDataQueue()
 		cronOk := cron.Start(func() {
-			// todo 反射获取input对象并且调用execute函数，将获取到的数据推送到处理器(私有处理，公共处理器)
-			fs := fs_notify.FsNotify{}
-			fs.ExeDataAcquisition(&dataQueue)
+			plugin.ExeDataAcquisition(&dataQueue)
 
-			//all.GetInput()
+			//有消息时进行下一步
+			if len(dataQueue.GetDataList()) > 0 {
+				for i2 := range dataQueue.GetDataList() {
+					fmt.Println(dataQueue.GetDataList()[i2].DataBody)
+				}
+				fmt.Println("================")
+			} else {
 
-			inputs := input_collection.GetInputs()
-			plugin := inputs["fsNotify"]
+				//如果没有消息释放当前定时器
+				cron.Stop()
 
-
-			fmt.Println(plugin)
-
-			for i2 := range dataQueue.GetDataList() {
-				fmt.Println(dataQueue.GetDataList()[i2].DataBody)
 			}
-			fmt.Println("================")
 		})
 
 		if cronOk == nil {

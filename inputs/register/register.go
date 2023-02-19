@@ -1,5 +1,3 @@
-//go:build !custom || fsNotify
-
 package register
 
 import (

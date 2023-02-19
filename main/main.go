@@ -3,6 +3,8 @@ package main
 import (
 	"hippo-data-acquisition/agent"
 	"hippo-data-acquisition/config"
+	_ "hippo-data-acquisition/inputs/register"
+	_ "hippo-data-acquisition/outputs/register"
 )
 
 // main 主函数入口
