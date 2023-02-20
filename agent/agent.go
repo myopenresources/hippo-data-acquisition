@@ -13,13 +13,9 @@ var (
 )
 
 func InitAgent() {
-	runInputs()
-
-}
-
-func runInputs() {
 	for i := range config.DaqConfig.Inputs {
-		logger.LogInfo("agent", "正在启动input "+config.DaqConfig.Inputs[i].InputName+"！")
+		inputConfig := config.DaqConfig.Inputs[i]
+		logger.LogInfo("agent", "正在启动input "+inputConfig.InputName+"！")
 		params := config.DaqConfig.Inputs[i].Params
 
 		specVal, ok := params["spec"]
@@ -28,33 +24,36 @@ func runInputs() {
 		}
 
 		inputs := input_collection.GetInputs()
-		plugin := inputs[config.DaqConfig.Inputs[i].InputName]
+		plugin := inputs[inputConfig.InputName]
 
 		// input插件不存在时
 		if plugin == nil {
-			logger.LogInfo("agent", "找不到input "+config.DaqConfig.Inputs[i].InputName+"！")
+			logger.LogInfo("agent", "找不到input "+inputConfig.InputName+"！")
 			continue
 		}
+
+		//初始化参数
+		plugin.InitPlugin(inputConfig)
 
 		cron := Cron{
 			spec: specVal.(string),
 		}
 
+		//准备定时器
+		plugin.PrepareCron()
+
 		dataQueue := queue.NewDataQueue()
 		cronOk := cron.Start(func() {
-			plugin.ExeDataAcquisition(&dataQueue)
-
-			//有消息时进行下一步
-			if len(dataQueue.GetDataList()) > 0 {
-				for i2 := range dataQueue.GetDataList() {
-					fmt.Println(dataQueue.GetDataList()[i2].DataBody)
+			//运行插件
+			inputData := runInput(plugin, dataQueue)
+			if inputData {
+				inputProcessorData := runInputProcessors(inputConfig, plugin, dataQueue)
+				if inputProcessorData {
+					processorData := runProcessors(inputConfig, plugin, dataQueue)
+					if processorData {
+						runOutPuts()
+					}
 				}
-				fmt.Println("================")
-			} else {
-
-				//如果没有消息释放当前定时器
-				cron.Stop()
-
 			}
 		})
 
@@ -64,6 +63,35 @@ func runInputs() {
 
 		InputCronList = append(InputCronList, cron)
 	}
+
+}
+
+func runInput(plugin input_collection.InputPlugin, dataQueue queue.DataQueue) bool {
+	plugin.BeforeExeDataAcquisition()
+	plugin.ExeDataAcquisition(&dataQueue)
+	plugin.AfterExeDataAcquisition()
+
+	//有消息时进行下一步
+	if len(dataQueue.GetDataList()) > 0 {
+		return true
+	}
+
+	return false
+}
+
+func runInputProcessors(config config.InputConfig, plugin input_collection.InputPlugin, dataQueue queue.DataQueue) bool {
+	for i := range config.Processors {
+		processor := config.Processors[i]
+		fmt.Println(processor.ProcessorsName)
+	}
+	return true
+}
+
+func runProcessors(config config.InputConfig, plugin input_collection.InputPlugin, dataQueue queue.DataQueue) bool {
+	return true
+}
+
+func runOutPuts() {
 
 }
 

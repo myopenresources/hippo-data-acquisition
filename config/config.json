@@ -22,6 +22,14 @@
       ]
     }
   ],
+  "processors": [
+    {
+      "processorsName": "filter",
+      "params": {
+        "filterField": ["user"]
+      }
+    }
+  ],
   "outputs": [
     {
       "outputName": "file",

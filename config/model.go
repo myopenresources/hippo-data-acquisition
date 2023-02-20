@@ -26,8 +26,9 @@ type OutputConfig struct {
 }
 
 type DataAcquisitionConfig struct {
-	Tag     TagConfig      `json:"tag""`
-	Agent   AgentConfig    `json:"agent"`
-	Inputs  []InputConfig  `json:"inputs"`
-	Outputs []OutputConfig `json:"outputs"`
+	Tag        TagConfig         `json:"tag""`
+	Agent      AgentConfig       `json:"agent"`
+	Inputs     []InputConfig     `json:"inputs"`
+	Processors []ProcessorConfig `json:"processors"`
+	Outputs    []OutputConfig    `json:"outputs"`
 }
