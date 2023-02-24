@@ -28,6 +28,9 @@ func (f *FsNotify) ExeDataAcquisition(dataQueue queue.Queue) {
 
 	fields["msg"] = "this is msg"
 	tags := make(map[string]string)
+
+	tags["test222"] = "250"
+	tags["test"] = "sdffsafsdfsdfsdf"
 	dataQueue.PushData(fields, tags)
 
 	i := 0

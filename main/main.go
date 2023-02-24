@@ -5,6 +5,7 @@ import (
 	"hippo-data-acquisition/config"
 	_ "hippo-data-acquisition/inputs/register"
 	_ "hippo-data-acquisition/outputs/register"
+	_ "hippo-data-acquisition/processors/register"
 )
 
 // main 主函数入口

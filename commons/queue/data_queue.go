@@ -1,11 +1,15 @@
 package queue
 
-import "errors"
+import (
+	"errors"
+	"golang.org/x/exp/maps"
+)
 
 type Queue interface {
 	PopData() (error, DataInfo)
 	PushData(dataBody map[string]interface{}, tag map[string]string)
 	GetDataList() []DataInfo
+	SetDataList(list []DataInfo)
 }
 type DataInfo struct {
 	DataBody map[string]interface{}
@@ -13,20 +17,30 @@ type DataInfo struct {
 }
 
 type DataQueue struct {
-	dataList []DataInfo
+	dataList  []DataInfo
+	globalTag map[string]string
 }
 
-func NewDataQueue() DataQueue {
+func NewDataQueue(globalTag map[string]string) DataQueue {
+	initTag := globalTag
+	if initTag == nil {
+		initTag = make(map[string]string)
+	}
 	dataQueue := DataQueue{
-		dataList: make([]DataInfo, 0),
+		dataList:  make([]DataInfo, 0),
+		globalTag: initTag,
 	}
 	return dataQueue
 }
 
 func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]string) {
+	if tag != nil {
+		maps.Copy(q.globalTag, tag)
+	}
+
 	q.dataList = append(q.dataList, DataInfo{
 		DataBody: dataBody,
-		Tag:      tag,
+		Tag:      q.globalTag,
 	})
 }
 
@@ -41,4 +55,8 @@ func (q *DataQueue) PopData() (error, DataInfo) {
 
 func (q *DataQueue) GetDataList() []DataInfo {
 	return q.dataList
+}
+
+func (q *DataQueue) SetDataList(list []DataInfo) {
+	q.dataList = list
 }

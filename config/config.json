@@ -8,6 +8,9 @@
   "inputs": [
     {
       "inputName": "fsNotify",
+      "tag": {
+        "name2": "test22"
+      },
       "params": {
         "files": ["C:\\"],
         "spec": "*/5 * * * * *"
