@@ -35,9 +35,9 @@
   ],
   "outputs": [
     {
-      "outputName": "file",
+      "outputName": "outputFile",
       "params": {
-        "filePath": ""
+        "filePath": "d:/outfile.txt"
       }
     }
   ]

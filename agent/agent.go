@@ -1,12 +1,12 @@
 package agent
 
 import (
-	"fmt"
 	"golang.org/x/exp/maps"
 	"hippo-data-acquisition/commons/logger"
 	"hippo-data-acquisition/commons/queue"
 	"hippo-data-acquisition/config"
 	"hippo-data-acquisition/inputs/input_collection"
+	"hippo-data-acquisition/outputs/output_collection"
 	"hippo-data-acquisition/processors/processors_collection"
 )
 
@@ -149,9 +149,27 @@ func runProcessors(processorsConfig []config.ProcessorConfig, pluginName string,
 	return true, dataQueue
 }
 
-func runOutPuts(outputConfig []config.OutputConfig, pluginName string, dataQueue queue.DataQueue) {
-	fmt.Println("outputsssss")
-	fmt.Println(dataQueue)
+func runOutPuts(outputsConfig []config.OutputConfig, pluginName string, dataQueue queue.DataQueue) {
+	outputs := output_collection.GetOutputs()
+	if len(outputs) <= 0 {
+		logger.LogInfo("agent", "未配置输出插件！")
+		return
+	}
+	for i := range outputsConfig {
+		outputConfig := outputsConfig[i]
+
+		output := outputs[outputConfig.OutputName]
+		if output == nil {
+			logger.LogInfo("agent", "找不到输出插件 "+outputConfig.OutputName+"！")
+			continue
+		}
+
+		output.InitPlugin(outputConfig, pluginName)
+		output.BeforeExeOutput()
+		output.ExeOutput(&dataQueue)
+
+	}
+
 }
 
 func GetInputCronList() []Cron {
