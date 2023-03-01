@@ -1,9 +1,9 @@
 package agent
 
 import (
-	"golang.org/x/exp/maps"
 	"hippo-data-acquisition/commons/logger"
 	"hippo-data-acquisition/commons/queue"
+	"hippo-data-acquisition/commons/utils"
 	"hippo-data-acquisition/config"
 	"hippo-data-acquisition/inputs/input_collection"
 	"hippo-data-acquisition/outputs/output_collection"
@@ -16,11 +16,14 @@ var (
 	dataQueueChan = make(chan queue.DataInfo, 50)
 )
 
+// InitAgent 初始化
 func InitAgent() {
+	go logger.InitLogger()
 	go runInputs()
 	go runOutPuts()
 }
 
+// runInputs 运行所有输入
 func runInputs() {
 	globalTag := config.DaqConfig.Tag
 
@@ -55,7 +58,7 @@ func runInputs() {
 
 		//将全局tag与插件的tag合并
 		if inputTag != nil {
-			maps.Copy(globalTag, inputTag)
+			utils.Concat(globalTag, inputTag)
 		}
 
 		// input插件不存在时
@@ -102,6 +105,7 @@ func runInputs() {
 	}
 }
 
+// runInput 运行输入
 func runInput(plugin input_collection.InputPlugin, dataQueue queue.DataQueue) (bool, queue.DataQueue) {
 	plugin.BeforeExeDataAcquisition()
 	plugin.ExeDataAcquisition(&dataQueue)
@@ -175,6 +179,7 @@ func runProcessors(processorsConfig []config.ProcessorConfig, pluginName string,
 	return true, dataQueue
 }
 
+// runOutPuts 运行输出
 func runOutPuts() {
 	outputsConfig := config.DaqConfig.Outputs
 
@@ -183,6 +188,7 @@ func runOutPuts() {
 		logger.LogInfo("agent", "未配置输出插件！")
 		return
 	}
+	//从管道中获取数据，并通知所有输出插件进行输出
 	for {
 		DataInfo, ok := <-dataQueueChan
 		if ok {

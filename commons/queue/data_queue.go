@@ -3,7 +3,7 @@ package queue
 import (
 	"encoding/json"
 	"errors"
-	"golang.org/x/exp/maps"
+	"hippo-data-acquisition/commons/utils"
 	"time"
 )
 
@@ -36,16 +36,16 @@ func NewDataQueue(globalTag map[string]string) DataQueue {
 }
 
 func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]string) {
-	if tag != nil {
+	if tag == nil {
 		tag = make(map[string]string)
-		maps.Copy(q.globalTag, tag)
 	}
+	utils.Concat(tag, q.globalTag)
 
-	q.globalTag["dataAcquisitionTime"] = time.Now().Format("2006-01-02 15:04:05")
-	
+	tag["dataAcquisitionTime"] = time.Now().Format("2006-01-02 15:04:05")
+
 	q.dataList = append(q.dataList, DataInfo{
 		DataBody: dataBody,
-		Tag:      q.globalTag,
+		Tag:      tag,
 	})
 }
 

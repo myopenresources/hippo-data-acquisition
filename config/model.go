@@ -27,4 +27,5 @@ type DataAcquisitionConfig struct {
 	Inputs     []InputConfig     `json:"inputs"`
 	Processors []ProcessorConfig `json:"processors"`
 	Outputs    []OutputConfig    `json:"outputs"`
+	LogPath    string            `json:"logPath"`
 }

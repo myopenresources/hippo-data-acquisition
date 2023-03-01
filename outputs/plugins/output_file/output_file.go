@@ -2,12 +2,12 @@ package output_file
 
 import (
 	"encoding/json"
+	"fmt"
 	"hippo-data-acquisition/commons/logger"
 	"hippo-data-acquisition/commons/queue"
+	"hippo-data-acquisition/commons/utils"
 	"hippo-data-acquisition/config"
 	"hippo-data-acquisition/outputs/output_collection"
-	"io"
-	"os"
 )
 
 type OutputFile struct {
@@ -18,9 +18,9 @@ type OutputFile struct {
 func (f *OutputFile) InitPlugin(config config.OutputConfig) {
 	filePath, ok := config.Params["filePath"]
 	if ok {
-		f.filePath = filePath.(string)
+		f.filePath = utils.NewDateFilePath(filePath.(string), "")
 	} else {
-		logger.LogInfo("outputFile", "文件输入插件缺少参数：filePath")
+		logger.LogInfo("outputFile", "文件输出插件缺少参数：filePath")
 	}
 
 }
@@ -36,20 +36,11 @@ func (f *OutputFile) ExeOutput(dataInfo queue.DataInfo) {
 	if err != nil {
 		logger.LogInfo("outputFile", "输出数据转换成json字符串失败！")
 	}
-	writeDataToFile(f.filePath, string(strByte))
 
-}
+	utils.WriteStrToFile(f.filePath, string(strByte), "outputFile", func(log string) {
+		fmt.Println(log)
+	})
 
-func writeDataToFile(filePath string, dataJson string) {
-	file, err := os.OpenFile(filePath, os.O_WRONLY, 0644)
-	if err != nil {
-		logger.LogInfo("outputFile", "创建输入文件对象失败："+err.Error())
-	} else {
-		n, _ := file.Seek(0, io.SeekEnd)
-		_, err = file.WriteAt([]byte(dataJson+"\n"), n)
-		logger.LogInfo("outputFile", "输出数据："+dataJson+"到"+filePath)
-	}
-	defer file.Close()
 }
 
 func init() {

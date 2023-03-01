@@ -7,19 +7,33 @@
   },
   "inputs": [
     {
+      "inputName": "cpu",
+      "tag": {
+      },
+      "params": {
+        "spec": "*/5 * * * * *"
+      },
+      "processors": [
+      ]
+    },
+    {
       "inputName": "fsNotify",
       "tag": {
         "version": "1.0.0"
       },
       "params": {
-        "files": ["C:\\"],
+        "files": [
+          "C:\\"
+        ],
         "spec": "*/5 * * * * *"
       },
       "processors": [
         {
           "processorsName": "filter",
           "params": {
-            "filterField": ["user"]
+            "filterField": [
+              "user"
+            ]
           }
         }
       ]
@@ -29,7 +43,9 @@
     {
       "processorsName": "filter",
       "params": {
-        "filterField": ["user"]
+        "filterField": [
+          "user"
+        ]
       }
     }
   ],
@@ -37,8 +53,9 @@
     {
       "outputName": "outputFile",
       "params": {
-        "filePath": "d:/outfile.txt"
+        "filePath": "d:/outfile.out"
       }
     }
-  ]
+  ],
+  "logPath": "d:/log.log"
 }
