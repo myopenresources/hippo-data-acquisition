@@ -8,6 +8,8 @@ import (
 	"hippo-data-acquisition/inputs/input_collection"
 	"hippo-data-acquisition/outputs/output_collection"
 	"hippo-data-acquisition/processors/processors_collection"
+	"runtime"
+	"time"
 )
 
 var (
@@ -25,6 +27,9 @@ func runInputs() {
 	if globalTag == nil {
 		globalTag = make(map[string]string)
 	}
+
+	//添加全局默认标签
+	addGlobalDefaultTags(globalTag)
 
 	inputs := input_collection.GetInputs()
 
@@ -195,8 +200,15 @@ func runOutPuts() {
 
 				logger.LogInfo("agent", "启动输出插件"+outputConfig.OutputName+"成功！")
 				output.BeforeExeOutput()
+
+				DataInfo.Tag["sendTime"] = time.Now().Format("2006-01-02 15:04:05")
 				output.ExeOutput(DataInfo)
 			}
 		}
 	}
+}
+
+// 添加全局默认标签
+func addGlobalDefaultTags(globalTag map[string]string) {
+	globalTag["os"] = runtime.GOOS
 }

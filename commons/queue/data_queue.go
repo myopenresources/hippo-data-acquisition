@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"golang.org/x/exp/maps"
+	"time"
 )
 
 type Queue interface {
@@ -35,9 +36,13 @@ func NewDataQueue(globalTag map[string]string) DataQueue {
 }
 
 func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]string) {
-	if tag != nil {
-		maps.Copy(q.globalTag, tag)
+	if tag == nil {
+		tag = make(map[string]string)
 	}
+
+	tag["dataAcquisitionTime"] = time.Now().Format("2006-01-02 15:04:05")
+
+	maps.Copy(q.globalTag, tag)
 
 	q.dataList = append(q.dataList, DataInfo{
 		DataBody: dataBody,

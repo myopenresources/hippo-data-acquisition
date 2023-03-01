@@ -1,6 +1,6 @@
 {
   "tag": {
-    "name": "test"
+    "env": "dev"
   },
   "agent": {
     "spec": "*/10 * * * * *"
@@ -9,7 +9,7 @@
     {
       "inputName": "fsNotify",
       "tag": {
-        "name2": "test22"
+        "version": "1.0.0"
       },
       "params": {
         "files": ["C:\\"],
