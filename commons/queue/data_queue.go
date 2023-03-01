@@ -36,14 +36,13 @@ func NewDataQueue(globalTag map[string]string) DataQueue {
 }
 
 func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]string) {
-	if tag == nil {
+	if tag != nil {
 		tag = make(map[string]string)
+		maps.Copy(q.globalTag, tag)
 	}
 
-	tag["dataAcquisitionTime"] = time.Now().Format("2006-01-02 15:04:05")
-
-	maps.Copy(q.globalTag, tag)
-
+	q.globalTag["dataAcquisitionTime"] = time.Now().Format("2006-01-02 15:04:05")
+	
 	q.dataList = append(q.dataList, DataInfo{
 		DataBody: dataBody,
 		Tag:      q.globalTag,
