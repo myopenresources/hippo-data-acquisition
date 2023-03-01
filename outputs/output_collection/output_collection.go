@@ -8,11 +8,11 @@ import (
 // OutputPlugin 输出插件接口
 type OutputPlugin interface {
 	// InitPlugin 初始化参数
-	InitPlugin(config config.OutputConfig, pluginName string)
+	InitPlugin(config config.OutputConfig)
 	// BeforeExeOutput  执行输出前
 	BeforeExeOutput()
 	// ExeOutput  执行输出
-	ExeOutput(dataQueue queue.Queue)
+	ExeOutput(dataInfo queue.DataInfo)
 }
 
 var (

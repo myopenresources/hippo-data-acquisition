@@ -1,12 +1,13 @@
 package queue
 
 import (
+	"encoding/json"
 	"errors"
 	"golang.org/x/exp/maps"
 )
 
 type Queue interface {
-	PopData() (error, DataInfo)
+	PopData() (error, DataInfo, string)
 	PushData(dataBody map[string]interface{}, tag map[string]string)
 	GetDataList() []DataInfo
 	SetDataList(list []DataInfo)
@@ -44,13 +45,19 @@ func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]str
 	})
 }
 
-func (q *DataQueue) PopData() (error, DataInfo) {
+func (q *DataQueue) PopData() (error, DataInfo, string) {
 	if len(q.dataList) == 0 {
-		return errors.New("队列为空！"), DataInfo{}
+		return errors.New("队列为空！"), DataInfo{}, ""
 	}
 	v := q.dataList[0]
 	q.dataList = q.dataList[1:]
-	return nil, v
+
+	strByte, err := json.Marshal(&v)
+	if err != nil {
+		return nil, v, ""
+	}
+
+	return nil, v, string(strByte)
 }
 
 func (q *DataQueue) GetDataList() []DataInfo {

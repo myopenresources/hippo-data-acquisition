@@ -11,15 +11,21 @@ import (
 )
 
 var (
-	InputCronList = make([]Cron, 0)
+	dataQueueChan = make(chan queue.DataInfo, 50)
 )
 
 func InitAgent() {
+	go runInputs()
+	go runOutPuts()
+}
+
+func runInputs() {
 	globalTag := config.DaqConfig.Tag
 
 	if globalTag == nil {
 		globalTag = make(map[string]string)
 	}
+
 	inputs := input_collection.GetInputs()
 
 	if len(inputs) <= 0 {
@@ -29,7 +35,7 @@ func InitAgent() {
 
 	for i := range config.DaqConfig.Inputs {
 		inputConfig := config.DaqConfig.Inputs[i]
-		logger.LogInfo("agent", "正在启动input "+inputConfig.InputName+"！")
+		logger.LogInfo("agent", "正在启动输入插件"+inputConfig.InputName+"！")
 		params := config.DaqConfig.Inputs[i].Params
 
 		//插件是否配置定时器表达式，如配置则使用插件配置，否则使用全局配置
@@ -49,7 +55,7 @@ func InitAgent() {
 
 		// input插件不存在时
 		if plugin == nil {
-			logger.LogInfo("agent", "找不到input "+inputConfig.InputName+"！")
+			logger.LogInfo("agent", "找不到输入插件"+inputConfig.InputName+"！")
 			continue
 		}
 
@@ -73,19 +79,22 @@ func InitAgent() {
 				if inputProcessorData {
 					processorData, dataQueue := runCommonProcessors(config.DaqConfig.Processors, inputConfig.InputName, dataQueue)
 					if processorData {
-						runOutPuts(config.DaqConfig.Outputs, inputConfig.InputName, dataQueue)
+						if len(dataQueue.GetDataList()) > 0 {
+							err, dataInfo, dataInfoStr := dataQueue.PopData()
+							if err == nil {
+								dataQueueChan <- dataInfo
+								logger.LogInfo("agent", "采集到数据："+dataInfoStr)
+							}
+						}
 					}
 				}
 			}
 		})
 
 		if cronOk == nil {
-			logger.LogInfo("agent", "启动input "+config.DaqConfig.Inputs[i].InputName+"成功！")
+			logger.LogInfo("agent", "启动输入插件"+config.DaqConfig.Inputs[i].InputName+"成功！")
 		}
-
-		InputCronList = append(InputCronList, cron)
 	}
-
 }
 
 func runInput(plugin input_collection.InputPlugin, dataQueue queue.DataQueue) (bool, queue.DataQueue) {
@@ -111,7 +120,7 @@ func runCommonProcessors(processorsConfig []config.ProcessorConfig, pluginName s
 	return runProcessors(processorsConfig, pluginName, dataQueue, true)
 }
 
-// runProcessor 运行处理器插件
+// runProcessor 运行处理插件插件
 func runProcessors(processorsConfig []config.ProcessorConfig, pluginName string, dataQueue queue.DataQueue, isCommonProcessor bool) (bool, queue.DataQueue) {
 	processors := processors_collection.GetProcessors()
 	if len(processors) <= 0 {
@@ -125,11 +134,23 @@ func runProcessors(processorsConfig []config.ProcessorConfig, pluginName string,
 		processor := processors[processorConfig.ProcessorsName]
 
 		if processor == nil {
-			logger.LogInfo("agent", "找不到处理插件 "+processorConfig.ProcessorsName+"！")
+			logger.LogInfo("agent", "找不到处理插件"+processorConfig.ProcessorsName+"！")
 			continue
 		}
 
+		if isCommonProcessor {
+			logger.LogInfo("agent", "正在启动公共处理插件"+processorConfig.ProcessorsName+"！")
+		} else {
+			logger.LogInfo("agent", "正在启动"+pluginName+"对应的的处理插件"+processorConfig.ProcessorsName+"！")
+		}
+
 		processor.InitPlugin(processorConfig, pluginName)
+
+		if isCommonProcessor {
+			logger.LogInfo("agent", "启动公共处理插件"+processorConfig.ProcessorsName+"成功！")
+		} else {
+			logger.LogInfo("agent", "启动"+pluginName+"对应的的处理插件"+processorConfig.ProcessorsName+"成功！")
+		}
 
 		processor.BeforeExeProcess()
 		processor.ExeProcess(&dataQueue)
@@ -137,9 +158,9 @@ func runProcessors(processorsConfig []config.ProcessorConfig, pluginName string,
 
 		if len(dataQueue.GetDataList()) <= 0 {
 			if isCommonProcessor {
-				logger.LogInfo("agent", pluginName+"对应的的处理器"+processorConfig.ProcessorsName+"返回的数据为空！")
+				logger.LogInfo("agent", "公共处理插件"+processorConfig.ProcessorsName+"返回的数据为空！")
 			} else {
-				logger.LogInfo("agent", "公共处理器"+processorConfig.ProcessorsName+"返回的数据为空！")
+				logger.LogInfo("agent", pluginName+"对应的的处理插件"+processorConfig.ProcessorsName+"返回的数据为空！")
 			}
 
 			return false, dataQueue
@@ -149,29 +170,33 @@ func runProcessors(processorsConfig []config.ProcessorConfig, pluginName string,
 	return true, dataQueue
 }
 
-func runOutPuts(outputsConfig []config.OutputConfig, pluginName string, dataQueue queue.DataQueue) {
+func runOutPuts() {
+	outputsConfig := config.DaqConfig.Outputs
+
 	outputs := output_collection.GetOutputs()
 	if len(outputs) <= 0 {
 		logger.LogInfo("agent", "未配置输出插件！")
 		return
 	}
-	for i := range outputsConfig {
-		outputConfig := outputsConfig[i]
+	for {
+		DataInfo, ok := <-dataQueueChan
+		if ok {
+			for i := range outputsConfig {
+				outputConfig := outputsConfig[i]
 
-		output := outputs[outputConfig.OutputName]
-		if output == nil {
-			logger.LogInfo("agent", "找不到输出插件 "+outputConfig.OutputName+"！")
-			continue
+				output := outputs[outputConfig.OutputName]
+				if output == nil {
+					logger.LogInfo("agent", "找不到输出插件"+outputConfig.OutputName+"！")
+					continue
+				}
+				logger.LogInfo("agent", "正在启动输出插件"+outputConfig.OutputName+"！")
+
+				output.InitPlugin(outputConfig)
+
+				logger.LogInfo("agent", "启动输出插件"+outputConfig.OutputName+"成功！")
+				output.BeforeExeOutput()
+				output.ExeOutput(DataInfo)
+			}
 		}
-
-		output.InitPlugin(outputConfig, pluginName)
-		output.BeforeExeOutput()
-		output.ExeOutput(&dataQueue)
-
 	}
-
-}
-
-func GetInputCronList() []Cron {
-	return InputCronList
 }
