@@ -17,25 +17,13 @@
       ]
     },
     {
-      "inputName": "fsNotify",
+      "inputName": "mem",
       "tag": {
-        "version": "1.0.0"
       },
       "params": {
-        "files": [
-          "C:\\"
-        ],
-        "spec": "*/5 * * * * *"
+        "spec": "*/8 * * * * *"
       },
       "processors": [
-        {
-          "processorsName": "filter",
-          "params": {
-            "filterField": [
-              "user"
-            ]
-          }
-        }
       ]
     }
   ],
@@ -43,9 +31,7 @@
     {
       "processorsName": "filter",
       "params": {
-        "filterField": [
-          "user"
-        ]
+
       }
     }
   ],

@@ -1,5 +1,7 @@
 package utils
 
+import "reflect"
+
 // Keys 获取键列表
 func Keys[M ~map[K]V, K comparable, V any](m M) []K {
 	r := make([]K, 0, len(m))
@@ -77,4 +79,35 @@ func DeleteFunc[M ~map[K]V, K comparable, V any](m M, del func(K, V) bool) {
 			delete(m, k)
 		}
 	}
+}
+
+// StructToMap 结构体转换map
+func StructToMap(obj any) map[string]interface{} {
+	data := make(map[string]interface{})
+	objT := reflect.TypeOf(obj)
+	objV := reflect.ValueOf(obj)
+	for i := 0; i < objT.NumField(); i++ {
+		fileName, ok := objT.Field(i).Tag.Lookup("json")
+		if ok {
+			data[fileName] = objV.Field(i).Interface()
+		} else {
+			data[objT.Field(i).Name] = objV.Field(i).Interface()
+		}
+	}
+	return data
+}
+
+// StructToSrcMap 结构体转换来源map
+func StructToSrcMap(obj any, srcMap map[string]interface{}) map[string]interface{} {
+	objT := reflect.TypeOf(obj)
+	objV := reflect.ValueOf(obj)
+	for i := 0; i < objT.NumField(); i++ {
+		fileName, ok := objT.Field(i).Tag.Lookup("json")
+		if ok {
+			srcMap[fileName] = objV.Field(i).Interface()
+		} else {
+			srcMap[objT.Field(i).Name] = objV.Field(i).Interface()
+		}
+	}
+	return srcMap
 }

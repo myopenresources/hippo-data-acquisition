@@ -1,36 +1,19 @@
 # hippo-data-acquisition
 
 #### Description
-河马数据采集器
+河马数据采集器采用go语言开发，通过定时器触发每个输入插件进行数据采集，采集的数据通过配置的输入插件处理器，而后进入到公共处理，最终由输出插件输出。
+输入和输出通过协程+管道方式进行连接，通过并行与并发方式提高性能。
 
 #### Software Architecture
-Software architecture description
+<img src="./轻量数据采集工具.png">
 
 #### Installation
+1.  go开发环境
+2.  导入程序
+3.  通过main/hippo_data_acquisition运行
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+#### Build
 
-#### Instructions
+1. cd main
+2. go build
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
-
-
-#### Gitee Feature
-
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
