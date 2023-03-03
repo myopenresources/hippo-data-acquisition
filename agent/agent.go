@@ -9,7 +9,6 @@ import (
 	"hippo-data-acquisition/outputs/output_collection"
 	"hippo-data-acquisition/processors/processors_collection"
 	"runtime"
-	"time"
 )
 
 var (
@@ -207,7 +206,7 @@ func runOutPuts() {
 				logger.LogInfo("agent", "启动输出插件"+outputConfig.OutputName+"成功！")
 				output.BeforeExeOutput()
 
-				DataInfo.Tag["sendTime"] = time.Now().Format("2006-01-02 15:04:05")
+				DataInfo.Tag["sendTime"] = utils.GetNowTime("")
 				output.ExeOutput(DataInfo)
 			}
 		}
