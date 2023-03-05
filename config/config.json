@@ -31,7 +31,17 @@
     {
       "processorsName": "filter",
       "params": {
-
+      }
+    },
+    {
+      "processorsName": "desensitization",
+      "params": {
+        "keywords": [
+          {
+            "value": "windows",
+            "desensitizationSymbol": "win"
+          }
+        ]
       }
     }
   ],
