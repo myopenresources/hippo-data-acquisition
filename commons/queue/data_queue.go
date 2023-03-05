@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"hippo-data-acquisition/commons/utils"
-	"time"
 )
 
 type Queue interface {
@@ -41,7 +40,7 @@ func (q *DataQueue) PushData(dataBody map[string]interface{}, tag map[string]str
 	}
 	utils.Concat(tag, q.globalTag)
 
-	tag["dataAcquisitionTime"] = time.Now().Format("2006-01-02 15:04:05")
+	tag["dataAcquisitionTime"] = utils.GetNowTime("")
 
 	q.dataList = append(q.dataList, DataInfo{
 		DataBody: dataBody,

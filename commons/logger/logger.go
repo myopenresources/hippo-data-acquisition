@@ -30,7 +30,7 @@ func LogWarning(module string, msg string) {
 }
 
 func createLogJson(module string, msg string, logType string) string {
-	return "{\"module\":" + module + ",\"msg\":\"" + msg + "\",\"logType\":\"" + logType + "\"}"
+	return "{\"module\":" + module + ",\"msg\":\"" + msg + "\",\"logType\":\"" + logType + "\",\"createTime\":" + utils.GetNowTime("") + "\"}"
 }
 
 func WriteLogToFile() {
