@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	logChan     = make(chan string, 50)
+	logChan     = make(chan string, 30)
 	logFilePath = ""
 )
 
@@ -37,6 +37,12 @@ func WriteLogToFile() {
 	for {
 		log, ok := <-logChan
 		if ok {
+			// 检查是否已经超过一天了，超过重新创建名字
+			checkLogFilePath := utils.NewDateFilePath(config.DaqConfig.LogPath, "")
+			if checkLogFilePath != logFilePath {
+				logFilePath = checkLogFilePath
+			}
+
 			utils.WriteStrToFile(logFilePath, log, "logger", func(log string) {
 				fmt.Println(log)
 			})
@@ -47,7 +53,6 @@ func WriteLogToFile() {
 func InitLogger() {
 	logPath := config.DaqConfig.LogPath
 	if logPath != "" {
-		logFilePath = utils.NewDateFilePath(logPath, "")
 		go WriteLogToFile()
 	}
 

@@ -28,7 +28,7 @@ func WriteStrToFile(filePath string, content string, module string, log func(log
 		log("创建输入文件对象失败：" + err.Error())
 	} else {
 		n, _ := file.Seek(0, io.SeekEnd)
-		_, err = file.WriteAt([]byte(content+"\n"), n)
+		_, err = file.WriteAt(StrToBytes(content+"\n"), n)
 		log("输出数据：" + content + "到" + filePath)
 	}
 	defer file.Close()

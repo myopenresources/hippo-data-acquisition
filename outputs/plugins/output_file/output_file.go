@@ -37,7 +37,7 @@ func (f *OutputFile) ExeOutput(dataInfo queue.DataInfo) {
 		logger.LogInfo("outputFile", "输出数据转换成json字符串失败！")
 	}
 
-	utils.WriteStrToFile(f.filePath, string(strByte), "outputFile", func(log string) {
+	utils.WriteStrToFile(f.filePath, utils.BytesToStr(strByte), "outputFile", func(log string) {
 		fmt.Println(log)
 	})
 

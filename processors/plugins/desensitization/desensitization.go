@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hippo-data-acquisition/commons/logger"
 	"hippo-data-acquisition/commons/queue"
+	"hippo-data-acquisition/commons/utils"
 	"hippo-data-acquisition/config"
 	"hippo-data-acquisition/processors/processors_collection"
 	"reflect"
@@ -46,7 +47,7 @@ func (d *Desensitization) ExeProcess(dataQueue queue.Queue) {
 			logger.LogError("desensitization", "脱敏处理器转换数据为json字符串失败："+err.Error())
 			continue
 		}
-		jsonStr := string(dataByte)
+		jsonStr := utils.BytesToStr(dataByte)
 
 		for i2 := range d.keywords {
 			item := d.keywords[i2]
@@ -54,7 +55,7 @@ func (d *Desensitization) ExeProcess(dataQueue queue.Queue) {
 		}
 
 		var newDataInfo = queue.DataInfo{}
-		err = json.Unmarshal([]byte(jsonStr), &newDataInfo)
+		err = json.Unmarshal(utils.StrToBytes(jsonStr), &newDataInfo)
 		if err != nil {
 			logger.LogError("desensitization", "脱敏处理器转换json字符为对象失败："+err.Error())
 			continue

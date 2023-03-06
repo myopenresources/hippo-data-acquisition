@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	dataQueueChan = make(chan queue.DataInfo, 50)
+	dataQueueChan = make(chan queue.DataInfo, 30)
 )
 
 // InitAgent 初始化

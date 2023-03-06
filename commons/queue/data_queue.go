@@ -60,7 +60,7 @@ func (q *DataQueue) PopData() (error, DataInfo, string) {
 		return nil, v, ""
 	}
 
-	return nil, v, string(strByte)
+	return nil, v, utils.BytesToStr(strByte)
 }
 
 func (q *DataQueue) GetDataList() []DataInfo {
