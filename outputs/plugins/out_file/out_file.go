@@ -1,4 +1,4 @@
-package output_file
+package out_file
 
 import (
 	"encoding/json"
@@ -10,39 +10,39 @@ import (
 	"hippo-data-acquisition/outputs/output_collection"
 )
 
-type OutputFile struct {
+type OutFile struct {
 	filePath string
 }
 
 // InitPlugin 初始化参数
-func (f *OutputFile) InitPlugin(config config.OutputConfig) {
+func (f *OutFile) InitPlugin(config config.OutputConfig) {
 	filePath, ok := config.Params["filePath"]
 	if ok {
 		f.filePath = utils.NewDateFilePath(filePath.(string), "")
 	} else {
-		logger.LogInfo("outputFile", "文件输出插件缺少参数：filePath")
+		logger.LogInfo("outFile", "文件输出插件缺少参数：filePath")
 	}
 
 }
 
 // BeforeExeOutput  执行输出前
-func (f *OutputFile) BeforeExeOutput() {
+func (f *OutFile) BeforeExeOutput() {
 
 }
 
 // ExeOutput  执行输出
-func (f *OutputFile) ExeOutput(dataInfo queue.DataInfo) {
+func (f *OutFile) ExeOutput(dataInfo queue.DataInfo) {
 	strByte, err := json.Marshal(&dataInfo)
 	if err != nil {
-		logger.LogInfo("outputFile", "输出数据转换成json字符串失败！")
+		logger.LogInfo("outFile", "输出数据转换成json字符串失败！")
 	}
 
-	utils.WriteStrToFile(f.filePath, utils.BytesToStr(strByte), "outputFile", func(log string) {
+	utils.WriteStrToFile(f.filePath, utils.BytesToStr(strByte), "OutFile", func(log string) {
 		fmt.Println(log)
 	})
 
 }
 
 func init() {
-	output_collection.Add("outputFile", &OutputFile{})
+	output_collection.Add("outFile", &OutFile{})
 }

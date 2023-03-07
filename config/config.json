@@ -47,7 +47,7 @@
   ],
   "outputs": [
     {
-      "outputName": "outputFile",
+      "outputName": "outFile",
       "params": {
         "filePath": "d:/outfile.out"
       }
