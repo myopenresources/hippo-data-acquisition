@@ -51,6 +51,13 @@
       "params": {
         "filePath": "d:/outfile.out"
       }
+    },
+    {
+      "outputName": "mySql",
+      "params": {
+        "host": "root:root@tcp(127.0.0.1:3308)/communal_db",
+        "tableName": "t_acq"
+      }
     }
   ],
   "logPath": "d:/log.log"

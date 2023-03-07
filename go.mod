@@ -3,8 +3,7 @@ module hippo-data-acquisition
 go 1.19
 
 require (
-	github.com/StackExchange/wmi v1.2.1
-	github.com/shirou/gopsutil v3.21.11+incompatible
+	github.com/go-sql-driver/mysql v1.7.0
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/tovenja/cron/v3 v3.0.2
 )
