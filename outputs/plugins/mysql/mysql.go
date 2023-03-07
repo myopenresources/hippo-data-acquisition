@@ -8,13 +8,18 @@ import (
 	"hippo-data-acquisition/commons/queue"
 	"hippo-data-acquisition/config"
 	"hippo-data-acquisition/outputs/output_collection"
+	"time"
 )
 
 type MySql struct {
-	host          string
-	tableName     string
-	dataJsonField string
-	db            *sql.DB
+	host            string
+	tableName       string
+	dataJsonField   string
+	maxOpenConns    int
+	maxIdleConns    int
+	connMaxLifetime time.Duration
+	connMaxIdleTime time.Duration
+	db              *sql.DB
 }
 
 func (m *MySql) testDbConn() error {
@@ -31,6 +36,12 @@ func (m *MySql) initDb() error {
 	if err != nil {
 		return err
 	}
+
+	m.db.SetMaxOpenConns(m.maxOpenConns)
+	m.db.SetMaxIdleConns(m.maxIdleConns)
+	m.db.SetConnMaxLifetime(m.connMaxLifetime * time.Hour)
+	m.db.SetConnMaxIdleTime(m.connMaxIdleTime * time.Hour)
+
 	return nil
 }
 
@@ -78,6 +89,34 @@ func (m *MySql) InitPlugin(config config.OutputConfig) {
 		logger.LogInfo("MySql", "mysql输出插件缺少参数：tableName")
 	}
 
+	maxOpenConns, ok := config.Params["maxOpenConns"]
+	if ok {
+		m.maxOpenConns = maxOpenConns.(int)
+	} else {
+		logger.LogInfo("MySql", "mysql输出插件缺少参数：maxOpenConns")
+	}
+
+	maxIdleConns, ok := config.Params["maxIdleConns"]
+	if ok {
+		m.maxIdleConns = maxIdleConns.(int)
+	} else {
+		logger.LogInfo("MySql", "mysql输出插件缺少参数：maxIdleConns")
+	}
+
+	connMaxLifetime, ok := config.Params["connMaxLifetime"]
+	if ok {
+		m.connMaxLifetime = connMaxLifetime.(time.Duration)
+	} else {
+		logger.LogInfo("MySql", "mysql输出插件缺少参数：connMaxLifetime")
+	}
+
+	connMaxIdleTime, ok := config.Params["connMaxIdleTime"]
+	if ok {
+		m.connMaxIdleTime = connMaxIdleTime.(time.Duration)
+	} else {
+		logger.LogInfo("MySql", "mysql输出插件缺少参数：connMaxIdleTime")
+	}
+
 }
 
 // BeforeExeOutput  执行输出前
@@ -99,8 +138,10 @@ func (m *MySql) ExeOutput(dataInfo queue.DataInfo) {
 		result, insertErr := m.Insert("INSERT INTO "+m.tableName+"(json_data) values (?)", strByte)
 		if insertErr != nil {
 			logger.LogInfo("mySql", "mysql插入数据失败："+insertErr.Error())
+		} else if result > 0 {
+			logger.LogInfo("mySql", "mysql插入数据成功！")
 		} else {
-			logger.LogInfo("mySql", "mysql插入数据成功："+string(result)+"！")
+			logger.LogInfo("mySql", "mysql插入数据未成功！")
 		}
 	}
 
