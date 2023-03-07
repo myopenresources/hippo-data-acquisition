@@ -17,8 +17,8 @@ type MySql struct {
 	dataJsonField   string
 	maxOpenConns    int
 	maxIdleConns    int
-	connMaxLifetime time.Duration
-	connMaxIdleTime time.Duration
+	connMaxLifetime int
+	connMaxIdleTime int
 	db              *sql.DB
 }
 
@@ -39,8 +39,8 @@ func (m *MySql) initDb() error {
 
 	m.db.SetMaxOpenConns(m.maxOpenConns)
 	m.db.SetMaxIdleConns(m.maxIdleConns)
-	m.db.SetConnMaxLifetime(m.connMaxLifetime * time.Hour)
-	m.db.SetConnMaxIdleTime(m.connMaxIdleTime * time.Hour)
+	m.db.SetConnMaxLifetime(time.Duration(m.connMaxLifetime) * time.Hour)
+	m.db.SetConnMaxIdleTime(time.Duration(m.connMaxIdleTime) * time.Hour)
 
 	return nil
 }
@@ -91,28 +91,28 @@ func (m *MySql) InitPlugin(config config.OutputConfig) {
 
 	maxOpenConns, ok := config.Params["maxOpenConns"]
 	if ok {
-		m.maxOpenConns = maxOpenConns.(int)
+		m.maxOpenConns = int(maxOpenConns.(float64))
 	} else {
 		logger.LogInfo("MySql", "mysql输出插件缺少参数：maxOpenConns")
 	}
 
 	maxIdleConns, ok := config.Params["maxIdleConns"]
 	if ok {
-		m.maxIdleConns = maxIdleConns.(int)
+		m.maxIdleConns = int(maxIdleConns.(float64))
 	} else {
 		logger.LogInfo("MySql", "mysql输出插件缺少参数：maxIdleConns")
 	}
 
 	connMaxLifetime, ok := config.Params["connMaxLifetime"]
 	if ok {
-		m.connMaxLifetime = connMaxLifetime.(time.Duration)
+		m.connMaxLifetime = int(connMaxLifetime.(float64))
 	} else {
 		logger.LogInfo("MySql", "mysql输出插件缺少参数：connMaxLifetime")
 	}
 
 	connMaxIdleTime, ok := config.Params["connMaxIdleTime"]
 	if ok {
-		m.connMaxIdleTime = connMaxIdleTime.(time.Duration)
+		m.connMaxIdleTime = int(connMaxIdleTime.(float64))
 	} else {
 		logger.LogInfo("MySql", "mysql输出插件缺少参数：connMaxIdleTime")
 	}
